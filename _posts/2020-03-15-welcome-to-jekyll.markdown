@@ -8,7 +8,6 @@ excerpt: Fun things about optimal control
 
 {% include mathjax_support.html %}
 
-
 The Maximum Principle
 ============================================================
 This notebook serves as a quick introduction/review of indirect methods of optimal control. Indirect optimal control is an approach for which one can solve optimal control problems by restating the optimal control problem into sub-problems. These sub-problems are often easier to solve numerically, computationally faster, and can deal with nonlinearities.
