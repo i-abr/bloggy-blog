@@ -24,25 +24,24 @@ $$
 $$
 
 where $x(t) \in \mathbb{R}^n$ is the state of the dynamical system at time $t$, $u(t) \in \mathbb{R}^m$ is the control input to the dynamical system at time $t$, and $f(x, u): \mathbb{R}^{n \times m} \to \mathbb{R}^n$ is the (often nonlinear) mapping that takes the state and control and returns the instantaneous change of the state $\dot{x}\in \mathbb{R}^n$. Often, these types of dynamical systems (e.g., robots) are written using the integral form:
+
 $$
     x(t_t) = x(t_0) + \int_{t_0}^{t_f} f(x(t), u(t) ) dt
 $$
+
 where the integration starts at some initial condition $x(t_0)$ at time $t_0$ and integrates forward onto time $t_f$.
 Note that this formulation assumes that $u$ and $x$ are both continuous in $t$ (same goes for $f(x,u)$, but not always true). The integration can be done using any choice of integration method (RK4, Euler, etc.).
 
 We are going to use the following nonlinear dynamical system:
+
 $$
     \dot{x} = f(x, u) = \begin{bmatrix} -0.1 && -1.0 \\ 1.0 && -0.1 \end{bmatrix} \begin{bmatrix}  x_1^3 \\ x_2\end{bmatrix} + \begin{bmatrix} 1.0 && 0. \\ 0. && 1.0 \end{bmatrix} u
 $$
+
 where $x = \left[x_1, x_2 \right]^\top$ for our example.
 
 In order to build this model we are going to use an autograd library (Google's Jax autodiff lib). To import we do the following:
 
-{% highlight python %}
-def foo
-  puts 'foo'
-end
-{% endhighlight %}
 
 ```python
 import jax.numpy as np
@@ -86,27 +85,35 @@ class SimpleModel(object):
 Now that we have defined this dynamical system let's define the objective (a.k.a. the task)! For those familiar with reinforcement learning, this objective is equivalent to a reward function (here it is going to be a cost function). The objective function assigns a worth (or cost) to the state and control combination at each time. Using an objective function allows us to define a task for the dynamical system.
 
 Let $\ell(x,u) : \mathbb{R}^{n \times m} \to \mathbb{R}$ be the running cost and let $m(x):\mathbb{R}^m \to \mathbb{R}$ be the terminal cost. Then the objective function $J(x(t), u(t))$ for $t \in \left[t_0, t_f \right]$ is defined as
+
 $$
     J = m(x(t_f)) + \int_{t_0}^{t_f} \ell(x(t), u(t)) dt
 $$
+
 $$
     \text{subject to } \dot{x} = f(x(t), u(t))
 $$
+
 where we add the dynamics as a constraint to the objective function $J$.
 
 The goal of optimal control is to find an input $u(t)$ such that $J$ is minimized. We can formally write this as
+
 $$
     \min_{u(t)} \qquad J = m(x(t_f)) + \int_{t_0}^{t_f} \ell(x(t), u(t)) dt
 $$
+
 $$
     \text{subject to } \dot{x} = f(x(t), u(t)) \qquad     \text{and } x(t_0)  = x_0
 $$
+
 where we fixed the initial condition.
 
 For the previously defined dynamical system, let us define the following running cost and terminal cost:
+
 $$
     \ell(x, u) = x^\top x + 0.001 u^\top u \qquad m(x) = x^\top x.
 $$
+
 This objective is minimized (and solved) when the dynamical system gets its state $x \to \mathbf{0}$.
 
 We are going to write a class object for the objective function. To do so, we are going to need the derivatives $\frac{\partial \ell}{\partial x},\frac{\partial \ell}{\partial u},\frac{\partial m}{\partial x} $ so we will make use of the ``grad`` function.
@@ -141,12 +148,15 @@ $$
 $$
 
 Since $J$ is continuous in $x, u$ and $t$ (does not always have to continuous in $t$ if one studies optimal switching in hybrid control theory), then we can take the variational derivative of $J$ with respect to $x$ and $u$
+
 $$
     \delta J = D J \cdot \delta v = m_x^\top \delta x(t_f) + \int_{t_0}^{t_f} \ell_x^\top \delta x + \ell_u^\top \delta u + \rho^\top f_x \delta x + \rho^\top f_u \delta u - \rho^\top \delta \dot{x} dt.
 $$
+
 where $\delta v = \left[\delta x, \delta u \right]^\top$ is the variation in the state $\delta x$ and control $\delta u$, $D J$ is the derivative of J with respect to $x$ and $u$, and the subscripts denote derivatives terms (i.e., $m_x = \frac{\partial m}{\partial x})$.
 
 That last term can be evaluated using integration by parts
+
 $$
     -\int_{t_0}^{t_f} \rho^\top \delta\dot{x} dt = - \rho(t_f)^\top \delta x(t_f) + \rho(t_0)^\top \delta x(t_0) + \int_{t_0}^{t_f} \dot{\rho}^\top \delta x dt
 $$
@@ -156,30 +166,39 @@ therefore the variation $\delta J$ becomes
 $$
     \delta J  = m_x(x(t_f))^\top \delta x(t_f) + \int_{t_0}^{t_f} (\ell_u^\top  + \rho^\top f_u) \delta u dt
 $$
+
 $$
         \qquad + \int_{t0}^{t_f} (\ell_x^\top + \rho^\top f_x + \dot{\rho}^\top) \delta x dt
         - \rho(t_f)^\top \delta x(t_f) + \rho(t_0)^\top \delta x(t_0)
 $$
 
-## Formal statement of necessary conditions for minimization problem (Pontryagin's maximum principle)
+Formal statement of necessary conditions for minimization problem (Pontryagin's maximum principle)
+================================================================================
 We know we are at a minimal solution (possibly optimal) when $\delta J = 0$.
 We can see that the optimal control $u(t)$ will satisfy the following equations
+
 $$
     \ell_u + f_u^\top \rho  = 0
-    $$
-    $$
+$$
+
+$$
     \ell_x + f_x^\top \rho + \dot{\rho} = 0
-    $$
-    $$
+$$
+
+$$
     m_x(x(t_f)) - \rho(t_f)  = 0
 $$
+
 Note that the (2) and (3) define the following differential equation
+
 $$
 \dot{\rho} = - \ell_x - f_x^\top \rho
 $$
+
 $$
 \rho(t_f) = m_x (x(t_f))
 $$
+
 which is solved backwards in time. Now this is a powerful statement! We can say whether a controller $u(t)$ is at least suboptimal if it satisfies equations (1-3). So how exactly can we get $u(t)$?
 One can quickly take note that we need to solve a backwards differential equation from a forward-time differential equation that defines the dynamics.
 The simplest way to do this is to following the gradient using Equation (1) as a guide for finding the optimal control $u(t)$ using an initial seed for $u(t)$.
