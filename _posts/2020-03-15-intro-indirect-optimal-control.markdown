@@ -1,34 +1,57 @@
 ---
 layout: post
-title:  "Indirect Optimal Control Approaches"
+title:  "Tutorial on Indirect Optimal Control"
 date:   2020-03-15 16:03:21 -0500
 categories: jekyll update
 excerpt: Fun things about optimal control
+author: Ian Abraham
 ---
 
-{% include mathjax_support.html %}
+## The Maximum Principle ##
 
-The Maximum Principle
-============================================================
+
 This notebook serves as a quick introduction/review of indirect methods of optimal control. Indirect optimal control is an approach for which one can solve optimal control problems by restating the optimal control problem into sub-problems. These sub-problems are often easier to solve numerically, computationally faster, and can deal with nonlinearities.
 
 
-Continuous dynamical systems with inputs
-========================================
+## Continuous dynamical systems with inputs ##
 
 Let's first consider a general continuous time dynamical system with input of the form
 
 $$
     \dot{x}(t) = f(x(t),u(t))
-$$
-
-where $x(t) \in \mathbb{R}^n$ is the state of the dynamical system at time $t$, $u(t) \in \mathbb{R}^m$ is the control input to the dynamical system at time $t$, and $f(x, u): \mathbb{R}^{n \times m} \to \mathbb{R}^n$ is the (often nonlinear) mapping that takes the state and control and returns the instantaneous change of the state $\dot{x}\in \mathbb{R}^n$. Often, these types of dynamical systems (e.g., robots) are written using the integral form:
 
 $$
-    x(t_t) = x(t_0) + \int_{t_0}^{t_f} f(x(t), u(t) ) dt
+
+$$
+\begin{align}
+ \mathcal{L} & ~=~ -V(q) + \frac{1}{2} m \dot q ^2 &  \text{write down the Lagrangian} \quad (2)\\
+ -\frac{\partial V(q)}{\partial q} &  ~=~ m \ddot q & \text{apply Euler-Lagrange} \quad (3)\\
+ F & ~=~ ma &  \text{this is Newton's second law } \quad (4)\\
+\end{align}
 $$
 
-where the integration starts at some initial condition $x(t_0)$ at time $t_0$ and integrates forward onto time $t_f$.
+$$
+\begin{align}
+&  \frac{d}{dt} \frac{\partial \mathcal{L}}{\partial \dot q_j}  ~=~ \frac{\partial \mathcal{L}}{\partial q_j} &  \text{Euler-Lagrange } (5)\\
+& \frac{d}{dt} \nabla_{\dot q} \mathcal{L}  ~=~ \nabla_{q} \mathcal{L} &  \text{vectorize } (6)\\
+& \nabla_q \mathcal{L}  ~=~ (\nabla_{\dot q}\nabla_{\dot q}^{\top}\mathcal{L})\ddot q + (\nabla_{q}\nabla_{\dot q}^{\top}\mathcal{L}) \dot q &  \text{expand }\frac{d}{dt} \text{ }(7)\\
+& \ddot q  ~=~ (\nabla_{\dot q}\nabla_{\dot q}^{\top}\mathcal{L})^{-1}[\nabla_q \mathcal{L} - (\nabla_{q}\nabla_{\dot q}^{\top}\mathcal{L})\dot q] & \text{solve for } \ddot q \text{ }(8)\\
+\end{align}
+$$
+
+where $x(t) \in \mathbb{R}^n$ is the state of the dynamical system at time $t$, $u(t) \in \mathbb{R}^m$ is the control
+input to the dynamical system at time $t$, and $f(x, u): \mathbb{R}^{n \times m} \to \mathbb{R}^n$ is the *often
+nonlinear* mapping that takes the state and control and returns the instantaneous change of the state $\dot{x}\in
+\mathbb{R}^n$. Often, these types of dynamical systems (e.g., robots) are written using the integral form:
+
+$$
+    x(t_t) = x(t_0) + \int_{t_0}^{t_f} f(x(t), u(t) ) dt \\
+    -V(q) + \frac{1}{2} m \dot q ^2
+    \label{eq:eqn1}
+    \tag{1}
+$$
+
+where the integration starts at some initial Eq.$\ref{eq:eqn1}$ condition $x(t_0)$ at time $t_0$ and integrates forward onto time $t_f$.
 Note that this formulation assumes that $u$ and $x$ are both continuous in $t$ (same goes for $f(x,u)$, but not always true). The integration can be done using any choice of integration method (RK4, Euler, etc.).
 
 We are going to use the following nonlinear dynamical system:
@@ -80,10 +103,12 @@ class SimpleModel(object):
 
 ```
 
-## Objectives in optimal control
+### Objectives in optimal control
+
+
 Now that we have defined this dynamical system let's define the objective (a.k.a. the task)! For those familiar with reinforcement learning, this objective is equivalent to a reward function (here it is going to be a cost function). The objective function assigns a worth (or cost) to the state and control combination at each time. Using an objective function allows us to define a task for the dynamical system.
 
-Let $\ell(x,u) : \mathbb{R}^{n \times m} \to \mathbb{R}$ be the running cost and let $m(x):\mathbb{R}^m \to \mathbb{R}$ be the terminal cost. Then the objective function $J(x(t), u(t))$ for $t \in \left[t_0, t_f \right]$ is defined as
+Let $ \ell(x,u) : \mathbb{R}^{n \times m} \to \mathbb{R} $ be the running cost and let $m(x):\mathbb{R}^m \to \mathbb{R}$ be the terminal cost. Then the objective function $J(x(t), u(t))$ for $t \in \left[t_0, t_f \right]$ is defined as
 
 $$
     J = m(x(t_f)) + \int_{t_0}^{t_f} \ell(x(t), u(t)) dt
