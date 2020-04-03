@@ -22,7 +22,7 @@ $$
 
 $$
 
-$$
+<!-- $$
 \begin{align}
  \mathcal{L} & ~=~ -V(q) + \frac{1}{2} m \dot q ^2 &  \text{write down the Lagrangian} \quad (2)\\
  -\frac{\partial V(q)}{\partial q} &  ~=~ m \ddot q & \text{apply Euler-Lagrange} \quad (3)\\
@@ -37,7 +37,7 @@ $$
 & \nabla_q \mathcal{L}  ~=~ (\nabla_{\dot q}\nabla_{\dot q}^{\top}\mathcal{L})\ddot q + (\nabla_{q}\nabla_{\dot q}^{\top}\mathcal{L}) \dot q &  \text{expand }\frac{d}{dt} \text{ }(7)\\
 & \ddot q  ~=~ (\nabla_{\dot q}\nabla_{\dot q}^{\top}\mathcal{L})^{-1}[\nabla_q \mathcal{L} - (\nabla_{q}\nabla_{\dot q}^{\top}\mathcal{L})\dot q] & \text{solve for } \ddot q \text{ }(8)\\
 \end{align}
-$$
+$$ -->
 
 where $x(t) \in \mathbb{R}^n$ is the state of the dynamical system at time $t$, $u(t) \in \mathbb{R}^m$ is the control
 input to the dynamical system at time $t$, and $f(x, u): \mathbb{R}^{n \times m} \to \mathbb{R}^n$ is the *often
