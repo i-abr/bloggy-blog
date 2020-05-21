@@ -18,16 +18,15 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Ian's Bloggy Blog
+title: Bloggy Blog
 email: iabr4073@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Bloggy blog about bloggy things with bloggy conclusions.
-baseurl: "bloggy-blog" # the subpath of your site, e.g. /blog
-#baseurl: "" # the subpath of your site, e.g. /blog
+#baseurl: "bloggy-blog" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
-
+twitter_username: ianabraha
+github_username: i-abr
 
 # Build settings
 theme: minima

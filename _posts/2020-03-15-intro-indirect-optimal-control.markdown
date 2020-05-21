@@ -2,8 +2,8 @@
 layout: post
 title:  "Tutorial on Indirect Optimal Control"
 date:   2020-03-15 16:03:21 -0500
-categories: jekyll update
-excerpt: Fun things about optimal control
+categories: tutorials
+excerpt: Learning indirect optimal control with Jax
 author: Ian Abraham
 ---
 
@@ -19,7 +19,6 @@ Let's first consider a general continuous time dynamical system with input of th
 
 $$
     \dot{x}(t) = f(x(t),u(t))
-
 $$
 
 <!-- $$
@@ -65,7 +64,8 @@ where $x = \left[x_1, x_2 \right]^\top$ for our example.
 In order to build this model we are going to use an autograd library (Google's Jax autodiff lib). To import we do the following:
 
 
-```python
+
+{% highlight python linenos %}
 import jax.numpy as np
 from jax import grad, jit, vmap, jacfwd
 from jax.numpy import cos, sin, tan, tanh
@@ -73,12 +73,15 @@ from jax.ops import index, index_add, index_update
 
 # %matplotlib notebook
 import matplotlib.pyplot as plt
-```
+
+{% endhighlight python linenos %}
+
 
 Let's create a class for the dynamical system called SimpleLinearModel. This will hold the underlying dynamical system and the continuous time derivatives. For optimal control, we are going to need to define the following derivatives $\frac{\partial f}{\partial x}, \frac{\partial f}{\partial u}$. To do that we are going to use the ``jacfwd`` function which stands for jacobian forward mode which uses forward-mode auto-differentiation to get us the derivatives we need.
 
 
-```python
+
+{% highlight python linenos %}
 class SimpleModel(object):
     def __init__(self):
         self.num_actions = 2
@@ -100,8 +103,7 @@ class SimpleModel(object):
         non_lin_x = np.array([x[0]*x[0]*x[0], x[1]])
         u = inputs['u']
         return np.dot(self.A, non_lin_x) + np.dot(self.B, u)
-
-```
+{% endhighlight python linenos %}
 
 ### Objectives in optimal control
 

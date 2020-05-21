@@ -9,6 +9,19 @@
     background: #eef;
   }
 
+    .lineno {
+      color: #ccc;
+      display:inline-block;
+      padding: 0 5px;
+      border-right:1px solid #ccc;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
   .c     { color: #998; font-style: italic } // Comment
   .err   { color: #a61717; background-color: #e3d2d2 } // Error
   .k     { font-weight: bold } // Keyword
